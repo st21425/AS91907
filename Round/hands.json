@@ -1,64 +1,63 @@
-{"hands":
+{
+    "High":
     {
-        "High":
-        {
-            "dies": [0],
-            "value": 10,
-            "multiplier": 1
-        },
-        "Pair":
-        {
-            "dies": [0, 0],
-            "value": 15,
-            "multiplier": 2
-        },
-        "Two Pair":
-        {
-            "dies": [0, 0, 1, 1],
-            "value": 25,
-            "multiplier": 2
-        },
-        "Three of a Kind":
-        {
-            "dies": [0, 0, 0],
-            "value": 35,
-            "multiplier": 3
-        },
-        "Four of a Kind":
-        {
-            "dies": [0, 0, 0, 0],
-            "value": 55,
-            "multiplier": 5
-        },
-        "Three Pair":
-        {
-            "dies": [0, 0, 1, 1, 2, 2],
-            "value": 70,
-            "multiplier": 6
-        },
-        "Five of a Kind":
-        {
-            "dies": [0, 0, 0, 0, 0],
-            "value": 85,
-            "multiplier": 7
-        },
-        "Two Three of a Kind":
-        {
-            "dies": [0, 0, 0, 1, 1, 1],
-            "value": 85,
-            "multiplier": 8
-        },
-        "Full House":
-        {
-            "dies": [0, 0, 0, 0, 1, 1],
-            "value": 100,
-            "multiplier": 12
-        },
-        "Six of a Kind":
-        {
-            "dies": [0, 0, 0, 0, 0, 0],
-            "value": 150,
-            "multiplier": 14
-        }
+        "dies": [0],
+        "value": 10,
+        "multiplier": 1
+    },
+    "Pair":
+    {
+        "dies": [2],
+        "value": 15,
+        "multiplier": 2
+    },
+    "Two Pair":
+    {
+        "dies": [2,2],
+        "value": 25,
+        "multiplier": 2
+    },
+    "Three of a Kind":
+    {
+        "dies": [3],
+        "value": 35,
+        "multiplier": 3
+    },
+    "Four of a Kind":
+    {
+        "dies": [4],
+        "value": 55,
+        "multiplier": 5
+    },
+    "Three Pair":
+    {
+        "dies": [2,2,2],
+        "value": 70,
+        "multiplier": 6
+    },
+    "Five of a Kind":
+    {
+        "dies": [5],
+        "value": 85,
+        "multiplier": 7
+    },
+    "Full House":
+    {
+        "dies": [2,3],
+        "value": 85,
+        "multiplier": 8
+    },
+    "Two Three of a Kind":
+    {
+        "dies": [3,3],
+        "value": 100,
+        "multiplier": 12
+    },
+    
+    "Six of a Kind":
+    {
+        "dies": [6],
+        "value": 150,
+        "multiplier": 14
     }
 }
