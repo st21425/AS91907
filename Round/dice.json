@@ -1,0 +1,236 @@
+{
+    "die1":
+    {
+        "side1": 
+        {
+            "value": 1,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side2": 
+        {
+            "value": 2,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side3": 
+        {
+            "value": 3,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side4": 
+        {
+            "value": 4,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side5": 
+        {
+            "value": 5,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side6": 
+        {
+            "value": 6,
+            "type": "standard",
+            "image": "green_die.png"
+        }
+    },
+    "die2":
+    {
+        "side1": 
+        {
+            "value": 1,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side2": 
+        {
+            "value": 2,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side3": 
+        {
+            "value": 3,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side4": 
+        {
+            "value": 4,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side5": 
+        {
+            "value": 5,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side6": 
+        {
+            "value": 6,
+            "type": "standard",
+            "image": "green_die.png"
+        }
+    },
+    "die3":
+    {
+        "side1": 
+        {
+            "value": 1,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side2": 
+        {
+            "value": 2,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side3": 
+        {
+            "value": 3,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side4": 
+        {
+            "value": 4,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side5": 
+        {
+            "value": 5,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side6": 
+        {
+            "value": 6,
+            "type": "standard",
+            "image": "green_die.png"
+        }
+    },
+    "die4":
+    {
+        "side1": 
+        {
+            "value": 1,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side2": 
+        {
+            "value": 2,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side3": 
+        {
+            "value": 3,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side4": 
+        {
+            "value": 4,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side5": 
+        {
+            "value": 5,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side6": 
+        {
+            "value": 6,
+            "type": "standard",
+            "image": "green_die.png"
+        }
+    },
+    "die5":
+    {
+        "side1": 
+        {
+            "value": 1,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side2": 
+        {
+            "value": 2,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side3": 
+        {
+            "value": 3,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side4": 
+        {
+            "value": 4,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side5": 
+        {
+            "value": 5,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side6": 
+        {
+            "value": 6,
+            "type": "standard",
+            "image": "green_die.png"
+        }
+    },
+    "die6":
+    {
+        "side1": 
+        {
+            "value": 1,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side2": 
+        {
+            "value": 2,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side3": 
+        {
+            "value": 3,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side4": 
+        {
+            "value": 4,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side5": 
+        {
+            "value": 5,
+            "type": "standard",
+            "image": "green_die.png"
+        },
+        "side6": 
+        {
+            "value": 6,
+            "type": "standard",
+            "image": "green_die.png"
+        }
+    }
+}
