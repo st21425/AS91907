@@ -1,0 +1,71 @@
+{"hands":
+    {
+        "High":
+        {
+            "dies": [0],
+            "value": 10,
+            "multiplier": 1
+        },
+        "Pair":
+        {
+            "dies": [0, 0],
+            "value": 15,
+            "multiplier": 2
+        },
+        "Two Pair":
+        {
+            "dies": [0, 0, 1, 1],
+            "value": 25,
+            "multiplier": 2
+        },
+        "Three of a Kind":
+        {
+            "dies": [0, 0, 0],
+            "value": 35,
+            "multiplier": 3
+        },
+        "Four of a Kind":
+        {
+            "dies": [0, 0, 0, 0],
+            "value": 55,
+            "multiplier": 5
+        },
+        "Three Pair":
+        {
+            "dies": [0, 0, 1, 1, 2, 2],
+            "value": 70,
+            "multiplier": 6
+        },
+        "Five of a Kind":
+        {
+            "dies": [0, 0, 0, 0, 0],
+            "value": 85,
+            "multiplier": 7
+        },
+        "Two Three of a Kind":
+        {
+            "dies": [0, 0, 0, 1, 1, 1],
+            "value": 85,
+            "multiplier": 8
+        },
+        "Full House":
+        {
+            "dies": [0, 0, 0, 0, 1, 1],
+            "value": 100,
+            "multiplier": 12
+        },
+        
+        "Straight":
+        {
+            "dies": [0, 1, 2, 3, 4,5],
+            "value": 125,
+            "multiplier": 12
+        },
+        "Six of a Kind":
+        {
+            "dies": [0, 0, 0, 0, 0, 0],
+            "value": 150,
+            "multiplier": 14
+        }
+    }
+}
