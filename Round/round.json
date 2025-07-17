@@ -1,0 +1,22 @@
+{
+    "Round1":
+    {
+        "Requirement": 400
+    },
+    "Round2":
+    {
+        "Requirement": 800
+    },
+    "Round3":
+    {
+        "Requirement": 1600
+    },
+    "Round4":
+    {
+        "Requirement": 3200
+    },
+    "Round5":
+    {
+        "Requirement": 6400
+    }
+}
