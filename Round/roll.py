@@ -1,9 +1,14 @@
+import json
 import random
 
-num_sides = 6 #may change later
+with open("dice.json", "r") as file: 
+    dies = json.load(file)
 
-def roll_dice():
+played = []
+
+for i in range(6):
+    num_sides = len(dies[f"die{i+1}"])
     die = random.randint(1, num_sides)
-    return die
+    value = dies[f"die{i+1}"][f"side{die}"]["value"]
+    played.append(value)
 
-print(roll_dice())
