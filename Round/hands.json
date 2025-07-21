@@ -47,6 +47,12 @@
         "value": 85,
         "multiplier": 8
     },
+    "Full Hotel":
+    {
+        "does": [2,4],
+        "value": 90,
+        "multiplier": 10
+    },
     "Two Three of a Kind":
     {
         "dies": [3,3],
