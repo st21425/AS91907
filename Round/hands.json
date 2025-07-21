@@ -23,6 +23,12 @@
         "value": 35,
         "multiplier": 3
     },
+        "Full House":
+    {
+        "dies": [2,3],
+        "value": 50,
+        "multiplier": 4
+    },
     "Four of a Kind":
     {
         "dies": [4],
@@ -32,8 +38,14 @@
     "Three Pair":
     {
         "dies": [2,2,2],
+        "value": 60,
+        "multiplier": 5
+    },
+    "Full Hotel":
+    {
+        "dies": [2,4],
         "value": 70,
-        "multiplier": 6
+        "multiplier": 5
     },
     "Five of a Kind":
     {
@@ -41,29 +53,17 @@
         "value": 85,
         "multiplier": 7
     },
-    "Full House":
-    {
-        "dies": [2,3],
-        "value": 85,
-        "multiplier": 8
-    },
-    "Full Hotel":
-    {
-        "does": [2,4],
-        "value": 90,
-        "multiplier": 10
-    },
     "Two Three of a Kind":
     {
         "dies": [3,3],
-        "value": 100,
-        "multiplier": 12
+        "value": 90,
+        "multiplier": 7
     },
     
     "Six of a Kind":
     {
         "dies": [6],
-        "value": 150,
-        "multiplier": 14
+        "value": 125,
+        "multiplier": 10
     }
 }
