@@ -68,7 +68,7 @@ class Round():
     
     #locks the dice
     def lock_dice(self, die_number):
-        dice = "die" + die_number
+        dice = "die" + str(die_number)
         if self.dice_locked[dice] == False:
             self.dice_locked[dice] = True
         else:
