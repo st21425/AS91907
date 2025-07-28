@@ -25,7 +25,6 @@ class GUI():
         self.frames["MainMenu"] = self.menu()
         self.frames["ShopMenu"] = self.shop()
         self.frames["GameMenu"] = self.game()
-        self.frames["Sidebar"] = self.sidebar()
 
         self.show_frames("MainMenu")
     
@@ -58,19 +57,27 @@ class GUI():
     
     def game(self):
         frame = Frame(self.container)
-        
-        sidebar = self.sidebar()
-        sidebar.pack(side="left", fill="y")
+        frame.grid(row=0, column=0, sticky="nsew")
+
+        frame.columnconfigure(1, weight=1)
+        frame.rowconfigure(0, weight=1)
+
+        sidebar_frame = self.sidebar(frame)
+        sidebar_frame.grid(row=0, column=0, sticky="nsew")
+
+        game_frame = self.game_content(frame)
+        game_frame.grid(row=0, column=1, sticky="nsew")
+
 
         
 
 
         return frame
     
-    def sidebar(self):
-        frame = Frame(self.container)
+    def sidebar(self, master):
+        frame = Frame(master, width=600)
         frame.grid(row=0, column=0, sticky="nsew")
-        frame.configure(bg=self.bg_colour)
+        frame.configure(bg=self.sidebar_colour)
 
         frame.rowconfigure(list(range(12)), weight = 1)
         frame.columnconfigure(0, weight = 1)
@@ -81,11 +88,37 @@ class GUI():
         self.mult = 1
         self.total = 1000
 
-        self.requirement_label = Label(frame, font = "Arial 12", text = f"Requirement: {self.requirement}", bg=self.bg_colour)
-        self.requirement_label.grid(padx=1, pady=10, sticky=EW)
+        self.requirement_label = Label(frame, font = "Arial 12", text = f"Requirement: {self.requirement}", bg=self.sidebar_colour, fg=self.sidebar_text)
+        self.requirement_label.grid(padx=100, pady=10, sticky=EW)
+
+        self.total_label = Label(frame, font = "Arial 12", text = f"Total: {self.total}", bg=self.sidebar_box_colour, fg=self.sidebar_text)
+        self.total_label.grid(padx=75, pady=5, sticky=EW)
 
         self.scoring_label = Label(frame, font = "Arial 12", text = f"{self.score} X {self.mult}", bg=self.sidebar_box_colour, fg=self.sidebar_text)
-        self.scoring_label.grid(padx=1, pady=10, sticky=EW)
+        self.scoring_label.grid(padx=75, pady=5, sticky=EW)
+
+        self.shop_button = Button(frame, text="Shop", bg=self.sidebar_box_colour, fg=self.sidebar_text, font="Arial 12", command=lambda: self.show_frames("ShopMenu"))
+        self.shop_button.grid(padx=75, pady=15, sticky=EW)
+
+        self.menu_button = Button(frame, text="Menu", bg=self.sidebar_box_colour, fg=self.sidebar_text, font="Arial 12", command=lambda: self.show_frames("MainMenu"))
+        self.menu_button.grid(padx=75, pady=15, sticky=EW)
+
+        return frame
+    
+    def game_content(self, master):
+        frame = Frame(master)
+        frame.configure(bg=self.bg_colour)
+
+        frame.grid(row=0, column=1, sticky="nsew")
+
+        self.dice_image = PhotoImage(file="n:/13PRG/st21425-Benjamin/Assessment/91907BenjaminArthur/GUI/green_dice.png")
+
+        for x in range(3):
+            for y in range(2):
+                dice_button = Button(frame, image=self.dice_image)
+                dice_button.grid(row=x, padx=50, pady=50, column=y, sticky=NSEW)
+        
+
         return frame
     
     def run(self):
