@@ -8,6 +8,9 @@ class GUI():
         self.root.rowconfigure(0, weight=1)
         self.root.columnconfigure(0, weight=1)
 
+        self.transparent_color = "#aabbcc"
+        self.root.wm_attributes('-transparentcolor', self.transparent_color)
+
         self.root.state('zoomed')#open window in fullscreen
 
         self.container = Frame(self.root)
@@ -21,10 +24,16 @@ class GUI():
         self.sidebar_box_colour = "#5A5A6D"
         self.sidebar_text = "#FFFFFF"
 
+        self.font = "Cascadia-code  12"
+        self.large_font = "Copperplate_Gothic 30"
+
         self.frames = {}
         self.frames["MainMenu"] = self.menu()
         self.frames["ShopMenu"] = self.shop()
         self.frames["GameMenu"] = self.game()
+
+        self.font = "Arial 16"
+        self.large_font = "Arial 30"
 
         self.show_frames("MainMenu")
     
@@ -40,13 +49,13 @@ class GUI():
         frame.rowconfigure(list(range(12)), weight = 1)
         frame.columnconfigure(0, weight = 1)
 
-        self.title_label = Label(frame, font = "Arial 30", text = "Rogue Roller", bg=self.bg_colour)
+        self.title_label = Label(frame, font =self.large_font, text = "Rogue Roller", bg=self.bg_colour)
         self.title_label.grid(padx=1, pady=150,sticky = NSEW)
 
-        self.game_button = Button(frame, text="New Game", bg=self.button_colour, font="Arial 12", command=lambda: self.show_frames("GameMenu"))
+        self.game_button = Button(frame, text="New Game", bg=self.button_colour, font=self.font, command=lambda: self.show_frames("GameMenu"))
         self.game_button.grid(padx=350, pady=10, sticky=NSEW)
 
-        self.quit_button = Button(frame, text="Quit", bg=self.button_colour, font="Arial 12", command=self.quit)
+        self.quit_button = Button(frame, text="Quit", bg=self.button_colour, font=self.font, command=self.quit)
         self.quit_button.grid(padx=350, pady=10, sticky=NSEW)
 
         return frame
@@ -88,19 +97,19 @@ class GUI():
         self.mult = 1
         self.total = 1000
 
-        self.requirement_label = Label(frame, font = "Arial 12", text = f"Requirement: {self.requirement}", bg=self.sidebar_colour, fg=self.sidebar_text)
+        self.requirement_label = Label(frame, font = self.font, text = f"Requirement: {self.requirement}", bg=self.sidebar_colour, fg=self.sidebar_text)
         self.requirement_label.grid(padx=100, pady=10, sticky=EW)
 
-        self.total_label = Label(frame, font = "Arial 12", text = f"Total: {self.total}", bg=self.sidebar_box_colour, fg=self.sidebar_text)
+        self.total_label = Label(frame, font = self.font, text = f"Total: {self.total}", bg=self.sidebar_box_colour, fg=self.sidebar_text)
         self.total_label.grid(padx=75, pady=5, sticky=EW)
 
-        self.scoring_label = Label(frame, font = "Arial 12", text = f"{self.score} X {self.mult}", bg=self.sidebar_box_colour, fg=self.sidebar_text)
+        self.scoring_label = Label(frame, font = self.font, text = f"{self.score} X {self.mult}", bg=self.sidebar_box_colour, fg=self.sidebar_text)
         self.scoring_label.grid(padx=75, pady=5, sticky=EW)
 
-        self.shop_button = Button(frame, text="Shop", bg=self.sidebar_box_colour, fg=self.sidebar_text, font="Arial 12", command=lambda: self.show_frames("ShopMenu"))
+        self.shop_button = Button(frame, text="Shop", bg=self.sidebar_box_colour, fg=self.sidebar_text, font=self.font, command=lambda: self.show_frames("ShopMenu"))
         self.shop_button.grid(padx=75, pady=15, sticky=EW)
 
-        self.menu_button = Button(frame, text="Menu", bg=self.sidebar_box_colour, fg=self.sidebar_text, font="Arial 12", command=lambda: self.show_frames("MainMenu"))
+        self.menu_button = Button(frame, text="Menu", bg=self.sidebar_box_colour, fg=self.sidebar_text, font=self.font, command=lambda: self.show_frames("MainMenu"))
         self.menu_button.grid(padx=75, pady=15, sticky=EW)
 
         return frame
@@ -110,13 +119,20 @@ class GUI():
         frame.configure(bg=self.bg_colour)
 
         frame.grid(row=0, column=1, sticky="nsew")
+        frame.rowconfigure(list(range(4)), weight=1)
+        frame.columnconfigure(list(range(2)), weight=1)
 
-        self.dice_image = PhotoImage(file="n:/13PRG/st21425-Benjamin/Assessment/91907BenjaminArthur/GUI/green_dice.png")
+        self.dice_image = PhotoImage(file="green_dice1.png")
 
         for x in range(3):
             for y in range(2):
                 dice_button = Button(frame, image=self.dice_image)
-                dice_button.grid(row=x, padx=50, pady=50, column=y, sticky=NSEW)
+                dice_button.grid(row=x, column=y)
+
+        for x in range(3):
+            for y in range(2):
+                dice_button = Label(frame, text=f"{x}{y}", fg="white",font=self.font, bg=self.transparent_color, width=10, height=5)
+                dice_button.grid(row=x, column=y)
         
 
         return frame
