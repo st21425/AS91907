@@ -126,14 +126,8 @@ class GUI():
 
         for x in range(3):
             for y in range(2):
-                dice_button = Button(frame, image=self.dice_image)
+                dice_button = Button(frame, image=self.dice_image, text=f"{x}{y}", fg="black", font=self.large_font, compound=CENTER)
                 dice_button.grid(row=x, column=y)
-
-        for x in range(3):
-            for y in range(2):
-                dice_button = Label(frame, text=f"{x}{y}", fg="white",font=self.font, bg=self.transparent_color, width=10, height=5)
-                dice_button.grid(row=x, column=y)
-        
 
         return frame
     
