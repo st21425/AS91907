@@ -52,7 +52,7 @@ class Round():
             self.dice_score = {}
             self.played = []
             self.total = 0
-            self.max_hands = 4
+            self.max_hands = 5
             self.roll_dice()
         
     
@@ -107,13 +107,13 @@ class Round():
         frame.columnconfigure(0, weight = 1)
 
         ####### PLACEHOLDERS #######
-        self.requirement = 300 
+        self.round_requirement = 300 
         self.score = 1000
         self.mult = 1
         self.total = 1000
         self.hands = 4 
 
-        self.requirement_label = Label(frame, font = self.font, text = f"Requirement: {self.requirement}", bg=self.sidebar_colour, fg=self.sidebar_text)
+        self.requirement_label = Label(frame, font = self.font, text = f"Requirement: {self.round_requirement}", bg=self.sidebar_colour, fg=self.sidebar_text)
         self.requirement_label.grid(padx=100, pady=10, sticky=EW)
 
         self.total_label = Label(frame, font = self.font, text = f"Total: {self.total}", bg=self.sidebar_box_colour, fg=self.sidebar_text)
@@ -140,11 +140,14 @@ class Round():
         
         self.dice_image = PhotoImage(file="green_dice1.png")
 
+        self.dice_buttons = []
+
         for x in range(3):
             for y in range(2):
                 print(x*2 + y + 1)
-                dice_button = Button(frame, image=self.dice_image, text=self.played[x*2 + y], bg="black", font=self.large_font, compound=CENTER, borderwidth=0, command=lambda value=(x*2 + y + 1): self.lock_dice(value))
-                dice_button.grid(row=x, column=y, padx=100)
+                self.dice_button = Button(frame, image=self.dice_image, text=self.played[x*2 + y], bg="black", font=self.large_font, compound=CENTER, borderwidth=0, command=lambda value=(x*2 + y + 1): self.lock_dice(value))
+                self.dice_button.grid(row=x, column=y, padx=100)
+                self.dice_buttons.append(self.dice_button)
         
         play_button = Button(frame, text="Play Hand", bg=self.button_colour, font=self.large_font, compound=CENTER, borderwidth=0, command=lambda: self.roll_dice())
         play_button.grid(row=1, column=2)
@@ -212,16 +215,27 @@ class Round():
 
     #rolls the dice
     def roll_dice(self):
-        #rolls the unlocked dice
-        for i in range(len(self.dice_locked)):
-            if self.dice_locked[f"die{i+1}"]:
-                continue  # Skip locked dice
-            num_sides = len(self.dice[f"die{i+1}"])
-            die = random.randint(1, num_sides)
-            value = self.dice[f"die{i+1}"][f"side{die}"]["value"]
-            self.dice_score[f"die{i+1}"] = value
-        self.played = list(self.dice_score.values())
-        print(self.played)
+        if self.max_hands > 0:
+            #rolls the unlocked dice
+            for i in range(len(self.dice_locked)):
+                if self.dice_locked[f"die{i+1}"]:
+                    continue  # Skip locked dice
+                value = random.choice(self.dice[f"die{i+1}"]["sides"])
+                self.dice_score[f"die{i+1}"] = value
+            self.played = list(self.dice_score.values())
+            print(self.played)
+
+            for i in range(len(self.dice_buttons)):
+                self.button_update = self.dice_buttons[i]
+                self.button_update.config(text=self.played[i])
+            
+            self.max_hands -= 1
+            print(self.max_hands)
+        if self.max_hands == 0:
+            self.requirement()
+
+
+
     
     def calculate_score(self):
         self.check_hand()
@@ -243,8 +257,8 @@ class Round():
     def requirement(self):
         with open("round.json", "r") as file: 
             round_data = json.load(file)
-        self.requirement = round_data["Round" + str(self.round)]["Requirement"]
-        if self.total >= self.requirement:
+        self.round_requirement = round_data["Round" + str(self.round)]["Requirement"]
+        if self.total >= self.round_requirement:
             self.win = True
             print("win")
         else:
