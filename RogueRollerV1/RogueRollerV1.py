@@ -4,6 +4,7 @@ import random
 
 class Round():
     def __init__(self):
+        self.max_hands = 5
         self.played = [0,0,0,0,0,0]
 
         self.root = Tk()
@@ -32,21 +33,15 @@ class Round():
         self.frames["MainMenu"] = self.menu()
         self.frames["ShopMenu"] = self.shop()
         self.frames["GameMenu"] = self.game()
+        self.frames["LossScreen"] = self.game_lose()
 
         self.font = "Arial 16"
         self.large_font = "Arial 30"
 
-        
-
-        #Declare values
-        self.dice_locked = {"die1": False, "die2": False, "die3": False, "die4": False, "die5": False, "die6": False}
-        with open("dice.json", "r") as file: 
-            self.dice = json.load(file)
-        
-        
+        self.show_frames("MainMenu")
         self.max_rounds = 5
         self.round = 0
-        self.show_frames("MainMenu")
+        
         while self.round < self.max_rounds:
             self.round += 1
             self.dice_score = {}
@@ -54,6 +49,8 @@ class Round():
             self.total = 0
             self.max_hands = 5
             self.roll_dice()
+
+        
         
     
     def show_frames(self, container):
@@ -71,7 +68,7 @@ class Round():
         self.title_label = Label(frame, font =self.large_font, text = "Rogue Roller", bg=self.bg_colour)
         self.title_label.grid(padx=1, pady=150,sticky = NSEW)
 
-        self.game_button = Button(frame, text="New Game", bg=self.button_colour, font=self.font, command=lambda: self.show_frames("GameMenu"))
+        self.game_button = Button(frame, text="New Game", bg=self.button_colour, font=self.font, command=lambda: [self.game_reset(), self.show_frames("GameMenu")])
         self.game_button.grid(padx=350, pady=10, sticky=NSEW)
 
         self.quit_button = Button(frame, text="Quit", bg=self.button_colour, font=self.font, command=self.quit)
@@ -81,9 +78,26 @@ class Round():
     
     def shop(self):
         frame = Frame(self.container)
+        frame.grid(row=0, column=0, sticky="nsew")
+
+        frame.columnconfigure(1, weight=1)
+        frame.rowconfigure(0, weight=1)
+
+        sidebar_frame = self.sidebar(frame)
+        sidebar_frame.grid(row=0, column=0, sticky="nsew")
+
+        shop_frame = self.shop_content(frame)
+        shop_frame.grid(row=0, column=1, sticky="nsew")
+
         return frame
     
     def game(self):
+        self.update_sidebar()
+        #Declare values
+        self.dice_locked = {"die1": False, "die2": False, "die3": False, "die4": False, "die5": False, "die6": False}
+        with open("dice.json", "r") as file: 
+            self.dice = json.load(file)
+
         frame = Frame(self.container)
         frame.grid(row=0, column=0, sticky="nsew")
 
@@ -98,6 +112,26 @@ class Round():
 
         return frame
     
+    
+    def game_lose(self):
+        frame = Frame(self.container)
+        frame.grid(row=0, column=0, sticky="nsew")
+        frame.configure(bg=self.bg_colour)
+
+        frame.rowconfigure(list(range(12)), weight = 1)
+        frame.columnconfigure(0, weight = 1)
+
+        self.title_label = Label(frame, font =self.large_font, text = "Game Over", bg=self.bg_colour)
+        self.title_label.grid(padx=1, pady=150,sticky = NSEW)
+
+        self.game_button = Button(frame, text="New Game", bg=self.button_colour, font=self.font, command=lambda: [self.game_reset(), self.show_frames("GameMenu")])
+        self.game_button.grid(padx=350, pady=10, sticky=NSEW)
+
+        self.quit_button = Button(frame, text="Quit", bg=self.button_colour, font=self.font, command=self.quit)
+        self.quit_button.grid(padx=350, pady=10, sticky=NSEW)
+
+        return frame
+
     def sidebar(self, master):
         frame = Frame(master, width=600)
         frame.grid(row=0, column=0, sticky="nsew")
@@ -107,11 +141,10 @@ class Round():
         frame.columnconfigure(0, weight = 1)
 
         ####### PLACEHOLDERS #######
+        self.score = 0
+        self.mult = 0
         self.round_requirement = 300 
-        self.score = 1000
-        self.mult = 1
-        self.total = 1000
-        self.hands = 4 
+        self.total = 0
 
         self.requirement_label = Label(frame, font = self.font, text = f"Requirement: {self.round_requirement}", bg=self.sidebar_colour, fg=self.sidebar_text)
         self.requirement_label.grid(padx=100, pady=10, sticky=EW)
@@ -119,10 +152,7 @@ class Round():
         self.total_label = Label(frame, font = self.font, text = f"Total: {self.total}", bg=self.sidebar_box_colour, fg=self.sidebar_text)
         self.total_label.grid(padx=75, pady=5, sticky=EW)
 
-        self.scoring_label = Label(frame, font = self.font, text = f"{self.score} X {self.mult}", bg=self.sidebar_box_colour, fg=self.sidebar_text)
-        self.scoring_label.grid(padx=75, pady=5, sticky=EW)
-
-        self.scoring_label = Label(frame, font = self.font, text = f"Remaining Hands: {self.hands}", bg=self.sidebar_box_colour, fg=self.sidebar_text)
+        self.scoring_label = Label(frame, font = self.font, text = f"Remaining Hands: {self.max_hands}", bg=self.sidebar_box_colour, fg=self.sidebar_text)
         self.scoring_label.grid(padx=75, pady=5, sticky=EW)
 
         self.menu_button = Button(frame, text="Menu", bg=self.sidebar_box_colour, fg=self.sidebar_text, font=self.font, command=lambda: self.show_frames("MainMenu"))
@@ -137,10 +167,11 @@ class Round():
         frame.grid(row=0, column=1, sticky="nsew")
         frame.rowconfigure(list(range(4)), weight=1)
         frame.columnconfigure(list(range(3)), weight=1)
-        
-        self.dice_image = PhotoImage(file="green_dice1.png")
 
         self.dice_buttons = []
+
+        self.dice_image = PhotoImage(file="green_dice1.png")
+        self.locked_dice_image = PhotoImage(file="green_dice_locked1.png")
 
         for x in range(3):
             for y in range(2):
@@ -149,11 +180,33 @@ class Round():
                 self.dice_button.grid(row=x, column=y, padx=100)
                 self.dice_buttons.append(self.dice_button)
         
-        play_button = Button(frame, text="Play Hand", bg=self.button_colour, font=self.large_font, compound=CENTER, borderwidth=0, command=lambda: self.roll_dice())
+        play_button = Button(frame, text="Play Hand", bg=self.button_colour, font=self.large_font, compound=CENTER, borderwidth=0, command=lambda: [self.calculate_score(), self.roll_dice(), self.update_sidebar()])
         play_button.grid(row=1, column=2)
         
         return frame
     
+    def shop_content(self, master):
+        frame = Frame(master)
+        frame.configure(bg=self.bg_colour)
+
+        frame.grid(row=0, column=1, sticky="nsew")
+        frame.rowconfigure(list(range(4)), weight=1)
+        frame.columnconfigure(list(range(7)), weight=1)
+
+        self.dice_image = PhotoImage(file="green_dice1.png")
+        self.shop_dice_image = self.dice_image.subsample(2)
+
+        self.current_dice_label = Label(frame, font =self.large_font, text = "Current Dice", bg=self.bg_colour)
+        self.current_dice_label.grid(padx=1, pady=15,sticky = NSEW, row=0, columnspan=7)
+
+        for x in range(6):
+                self.dice_button = Button(frame, image=self.shop_dice_image, text= f"Dice {x + 1}", bg="black", font=self.font, compound=CENTER, borderwidth=0)
+                self.dice_button.grid(column=x, row=1, padx=10) 
+
+        return frame       
+
+
+
     def run(self):
         self.root.mainloop()
     def quit(self):
@@ -209,8 +262,12 @@ class Round():
         dice = "die" + str(die_number)
         if self.dice_locked[dice] == False:
             self.dice_locked[dice] = True
+            self.button_update = self.dice_buttons[die_number -1]
+            self.button_update.config(image=self.locked_dice_image)
         else:
             self.dice_locked[dice] = False
+            self.button_update = self.dice_buttons[die_number -1]
+            self.button_update.config(image=self.dice_image)
         print(f"Die {die_number} locked: {self.dice_locked[dice]}")
 
     #rolls the dice
@@ -231,25 +288,27 @@ class Round():
             
             self.max_hands -= 1
             print(self.max_hands)
+
+            
+
+            self.scoring_label.config(text = f"Remaining Hands: {self.max_hands}")
+            self.total_label.config(text = f"Total: {self.total}")
         if self.max_hands == 0:
             self.requirement()
 
-
-
-    
     def calculate_score(self):
         self.check_hand()
-        score = self.hands[self.played_hand]["value"]
-        multiplier = self.hands[self.played_hand]["multiplier"]
+        self.score = self.hands[self.played_hand]["value"]
+        self.multiplier = self.hands[self.played_hand]["multiplier"]
 
         try:
             if len(self.scoring) > 1:
-                score += sum(self.scoring)
+                self.score += sum(self.scoring)
         except TypeError:
-            score += self.scoring
+            self.score += self.scoring
 
-        self.hand_score = score * multiplier
-        self.total += score * multiplier
+        self.hand_score = self.score * self.multiplier
+        self.total += self.score * self.multiplier
         print(self.hand_score)
         print(self.total)
         return self.total
@@ -260,11 +319,27 @@ class Round():
         self.round_requirement = round_data["Round" + str(self.round)]["Requirement"]
         if self.total >= self.round_requirement:
             self.win = True
-            print("win")
+            self.show_frames("ShopMenu")
         else:
             self.win = False
-            print("lose")
+            self.show_frames("LossScreen")
         return self.win
+
+    def game_reset(self):
+        self.dice_locked = {"die1": False, "die2": False, "die3": False, "die4": False, "die5": False, "die6": False}
+        self.total = 0
+        self.round = 0
+        self.round += 1
+        self.dice_score = {}
+        self.played = []
+        self.total = 0
+        self.max_hands = 5
+        self.roll_dice()
+
+    def update_sidebar(self):
+        self.requirement_label.config(text=f"Requirement: {self.round_requirement}")
+        self.total_label.config(text=f"Total: {self.total}")
+        self.scoring_label.config(text=f"Remaining Hands: {self.max_hands}")
 
 GAME_RUNNING = Round()
 GAME_RUNNING.run()
