@@ -6,7 +6,7 @@ class Round():
     def __init__(self):
         self.max_hands = 5
         self.played = [0,0,0,0,0,0]
-        self.money = 0
+        
 
         self.root = Tk()
         self.root.title("Rogue Roller")
@@ -14,16 +14,15 @@ class Round():
         self.root.rowconfigure(0, weight=1)
         self.root.columnconfigure(0, weight=1)
 
+        self.money = 0
+        self.money_var = StringVar()
+        self.money_var.set(f"Money: {self.money}")
+
         self.dice_image = PhotoImage(file="green_dice1.png")
         self.locked_dice_image = PhotoImage(file="green_dice_locked1.png")
         self.shop_dice_image = self.dice_image.subsample(2)
 
         self.root.state('zoomed')#open window in fullscreen
-
-        self.container = Frame(self.root)
-        self.container.grid(row = 0, column = 0, sticky = "nsew")
-        self.container.rowconfigure(0, weight=1)
-        self.container.columnconfigure(0, weight=1)
 
         self.button_colour = "#B6AADD"
         self.bg_colour = "#746aff"
@@ -34,6 +33,21 @@ class Round():
         self.font = "Cascadia-code  12"
         self.large_font = "Copperplate_Gothic 30"
 
+        self.container = Frame(self.root)
+        self.container.grid(row=0, column=0, sticky="nsew")
+        self.container.rowconfigure(0, weight=1)
+        # Create 2 columns: one for the sidebar, one for the content
+        self.container.columnconfigure(0, weight=0) # Sidebar column (fixed size)
+        self.container.columnconfigure(1, weight=1) # Content column (expands)
+
+        # Create the sidebar frame ONCE and place it in the first column
+        self.sidebar_frame = self.sidebar(self.container)
+        self.sidebar_frame.grid(row=0, column=0, sticky="nsew")
+
+
+        self.sidebar_frame = self.sidebar(Frame(self.container))
+        self.sidebar_frame.grid(row=0, column=0, sticky="nsew")
+
         self.frames = {}
         self.frames["MainMenu"] = self.menu()
         self.frames["ShopMenu"] = self.shop()
@@ -43,30 +57,45 @@ class Round():
         self.font = "Arial 16"
         self.large_font = "Arial 30"
 
-        
-
         self.show_frames("MainMenu")
         self.max_rounds = 5
         self.round = 0
         
-        while self.round < self.max_rounds:
-            self.round += 1
-            self.dice_score = {}
-            self.played = []
-            self.total = 0
-            self.max_hands = 5
-            self.roll_dice()
+        #while self.round < self.max_rounds:
+        #    self.round += 1
+        #    self.dice_score = {}
+        #    self.played = []
+        #    self.total = 0
+        #    self.max_hands = 5
+        #    self.roll_dice()
 
         
         
     
     def show_frames(self, container):
-        frame = self.frames[container]
-        frame.tkraise()
+        #frame = self.frames[container]
+        #frame.tkraise()
+
+        for frame_name, frame_instance in self.frames.items():
+            # Hide all other frames
+            frame_instance.grid_remove()
+
+        # Place the requested frame
+        frame_to_show = self.frames[container]
+
+        if container in ["MainMenu", "LossScreen"]:
+            # For full-screen frames, we hide the sidebar and show the frame
+            self.sidebar_frame.grid_remove()
+            frame_to_show.grid(row=0, column=0, sticky="nsew", columnspan=2)
+            frame_to_show.tkraise()
+        else:
+            # For other frames, we show the sidebar and place the frame next to it
+            self.sidebar_frame.grid(row=0, column=0, sticky="nsew")
+            frame_to_show.grid(row=0, column=1, sticky="nsew")
+            frame_to_show.tkraise()
 
     def menu(self):
         frame = Frame(self.container)
-        frame.grid(row=0, column=0, sticky="nsew")
         frame.configure(bg=self.bg_colour)
 
         frame.rowconfigure(list(range(12)), weight = 1)
@@ -90,9 +119,6 @@ class Round():
         frame.columnconfigure(1, weight=1)
         frame.rowconfigure(0, weight=1)
         frame.rowconfigure(1, weight=1)
-        
-        sidebar_frame = self.sidebar(frame)
-        sidebar_frame.grid(rowspan=12, column=0, sticky="nsew")
 
         dice_frame = self.current_dice(frame)
         dice_frame.grid(row=0, column=1, sticky="nsew")
@@ -114,9 +140,6 @@ class Round():
 
         frame.columnconfigure(1, weight=1)
         frame.rowconfigure(0, weight=1)
-
-        sidebar_frame = self.sidebar(frame)
-        sidebar_frame.grid(row=0, column=0, sticky="nsew")
 
         game_frame = self.game_content(frame)
         game_frame.grid(row=0, column=1, sticky="nsew")
@@ -145,7 +168,6 @@ class Round():
 
     def sidebar(self, master):
         frame = Frame(master, width=600)
-        frame.grid(row=0, column=0, sticky="nsew")
         frame.configure(bg=self.sidebar_colour)
 
         frame.rowconfigure(list(range(12)), weight = 1)
@@ -166,7 +188,7 @@ class Round():
         self.scoring_label = Label(frame, font = self.font, text = f"Remaining Hands: {self.max_hands}", bg=self.sidebar_box_colour, fg=self.sidebar_text)
         self.scoring_label.grid(padx=75, pady=5, sticky=EW)
 
-        self.money_label = Label(frame, font=self.font, text=f"Money: {self.money}", bg=self.sidebar_box_colour, fg=self.sidebar_text)
+        self.money_label = Label(frame, font=self.font, textvariable=self.money_var, bg=self.sidebar_box_colour, fg=self.sidebar_text)
         self.money_label.grid(padx=75, pady=5, sticky=EW)
 
         self.menu_button = Button(frame, text="Menu", bg=self.sidebar_box_colour, fg=self.sidebar_text, font=self.font, command=lambda: self.show_frames("MainMenu"))
@@ -193,7 +215,7 @@ class Round():
                 self.dice_button.grid(row=x, column=y, padx=100)
                 self.dice_buttons.append(self.dice_button)
         
-        play_button = Button(frame, text="Play Hand", bg=self.button_colour, font=self.large_font, compound=CENTER, borderwidth=0, command=lambda: [self.calculate_score(), self.roll_dice(), self.update_sidebar()])
+        play_button = Button(frame, text="Play Hand", bg=self.button_colour, font=self.large_font, compound=CENTER, borderwidth=0, command=self.play_hand)
         play_button.grid(row=1, column=2)
         
         return frame
@@ -213,6 +235,16 @@ class Round():
                 self.dice_button = Button(frame, image=self.shop_dice_image, text= f"Dice {x + 1}", bg="black", font=self.font, compound=CENTER, borderwidth=0)
                 self.dice_button.grid(column=x, row=1, padx=10)
         return frame
+    
+    def play_hand(self):
+        self.roll_dice()
+        self.calculate_score()
+        self.max_hands -= 1 
+        self.update_sidebar() 
+        
+        if self.max_hands <= 0:
+            self.requirement()
+            self.update_sidebar() 
 
     def shop_content(self, master):
         frame = Frame(master)
@@ -308,29 +340,17 @@ class Round():
 
     #rolls the dice
     def roll_dice(self):
-        if self.max_hands > 0:
-            #rolls the unlocked dice
-            for i in range(len(self.dice_locked)):
-                if self.dice_locked[f"die{i+1}"]:
-                    continue  # Skip locked dice
-                value = random.choice(self.dice[f"die{i+1}"]["sides"])
-                self.dice_score[f"die{i+1}"] = value
-            self.played = list(self.dice_score.values())
-            print(self.played)
+        for i in range(len(self.dice_locked)):
+            if self.dice_locked[f"die{i+1}"]:
+                continue  # Skip locked dice
+            value = random.choice(self.dice[f"die{i+1}"]["sides"])
+            self.dice_score[f"die{i+1}"] = value
+        
+        self.played = list(self.dice_score.values())
 
-            for i in range(len(self.dice_buttons)):
-                self.button_update = self.dice_buttons[i]
-                self.button_update.config(text=self.played[i])
-            
-            self.max_hands -= 1
-            print(self.max_hands)
-
-            
-
-            self.scoring_label.config(text = f"Remaining Hands: {self.max_hands}")
-            self.total_label.config(text = f"Total: {self.total}")
-        if self.max_hands == 0:
-            self.requirement()
+        for i in range(len(self.dice_buttons)):
+            self.button_update = self.dice_buttons[i]
+            self.button_update.config(text=self.played[i])
 
     def calculate_score(self):
         self.check_hand()
@@ -355,9 +375,11 @@ class Round():
         self.round_requirement = round_data["Round" + str(self.round)]["Requirement"]
         if self.total >= self.round_requirement:
             self.win = True
-            self.money += round_data["Round" + str(self.round)]["Payout"]
+            payout = round_data["Round" + str(self.round)]["Payout"]
+            current_money = int(self.money_var.get().split(" ")[1])
+            new_money = current_money + payout
+            self.money_var.set(f"Money: {new_money}")
             self.update_shop()
-            self.update_sidebar()
             self.show_frames("ShopMenu")
         else:
             self.win = False
@@ -375,6 +397,7 @@ class Round():
         self.max_hands = 5
         self.roll_dice()
         self.money = 0
+        self.money_var.set(f"Money: {self.money}")
 
     def update_sidebar(self):
         self.requirement_label.config(text=f"Requirement: {self.round_requirement}")
