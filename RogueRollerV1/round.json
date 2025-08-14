@@ -1,22 +1,27 @@
 {
     "Round1":
     {
-        "Requirement": 400
+        "Requirement": 400,
+        "Payout": 2
     },
     "Round2":
     {
-        "Requirement": 800
+        "Requirement": 800,
+        "Payout": 3
     },
     "Round3":
     {
-        "Requirement": 1600
+        "Requirement": 1000,
+        "Payout": 4
     },
     "Round4":
     {
-        "Requirement": 3200
+        "Requirement": 1400,
+        "Payout": 4
     },
     "Round5":
     {
-        "Requirement": 6400
+        "Requirement": 1800,
+        "Payout": 5
     }
 }
