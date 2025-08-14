@@ -6,12 +6,17 @@ class Round():
     def __init__(self):
         self.max_hands = 5
         self.played = [0,0,0,0,0,0]
+        self.money = 0
 
         self.root = Tk()
         self.root.title("Rogue Roller")
         self.root.grid()
         self.root.rowconfigure(0, weight=1)
         self.root.columnconfigure(0, weight=1)
+
+        self.dice_image = PhotoImage(file="green_dice1.png")
+        self.locked_dice_image = PhotoImage(file="green_dice_locked1.png")
+        self.shop_dice_image = self.dice_image.subsample(2)
 
         self.root.state('zoomed')#open window in fullscreen
 
@@ -37,6 +42,8 @@ class Round():
 
         self.font = "Arial 16"
         self.large_font = "Arial 30"
+
+        
 
         self.show_frames("MainMenu")
         self.max_rounds = 5
@@ -82,12 +89,16 @@ class Round():
 
         frame.columnconfigure(1, weight=1)
         frame.rowconfigure(0, weight=1)
-
+        frame.rowconfigure(1, weight=1)
+        
         sidebar_frame = self.sidebar(frame)
-        sidebar_frame.grid(row=0, column=0, sticky="nsew")
+        sidebar_frame.grid(rowspan=12, column=0, sticky="nsew")
+
+        dice_frame = self.current_dice(frame)
+        dice_frame.grid(row=0, column=1, sticky="nsew")
 
         shop_frame = self.shop_content(frame)
-        shop_frame.grid(row=0, column=1, sticky="nsew")
+        shop_frame.grid(row=1, column=1, sticky="nsew")
 
         return frame
     
@@ -143,7 +154,7 @@ class Round():
         ####### PLACEHOLDERS #######
         self.score = 0
         self.mult = 0
-        self.round_requirement = 300 
+        self.round_requirement = 0
         self.total = 0
 
         self.requirement_label = Label(frame, font = self.font, text = f"Requirement: {self.round_requirement}", bg=self.sidebar_colour, fg=self.sidebar_text)
@@ -155,8 +166,13 @@ class Round():
         self.scoring_label = Label(frame, font = self.font, text = f"Remaining Hands: {self.max_hands}", bg=self.sidebar_box_colour, fg=self.sidebar_text)
         self.scoring_label.grid(padx=75, pady=5, sticky=EW)
 
+        self.money_label = Label(frame, font=self.font, text=f"Money: {self.money}", bg=self.sidebar_box_colour, fg=self.sidebar_text)
+        self.money_label.grid(padx=75, pady=5, sticky=EW)
+
         self.menu_button = Button(frame, text="Menu", bg=self.sidebar_box_colour, fg=self.sidebar_text, font=self.font, command=lambda: self.show_frames("MainMenu"))
         self.menu_button.grid(padx=75, pady=15, sticky=EW)
+
+        
 
         return frame
     
@@ -170,9 +186,6 @@ class Round():
 
         self.dice_buttons = []
 
-        self.dice_image = PhotoImage(file="green_dice1.png")
-        self.locked_dice_image = PhotoImage(file="green_dice_locked1.png")
-
         for x in range(3):
             for y in range(2):
                 print(x*2 + y + 1)
@@ -185,7 +198,7 @@ class Round():
         
         return frame
     
-    def shop_content(self, master):
+    def current_dice(self, master):
         frame = Frame(master)
         frame.configure(bg=self.bg_colour)
 
@@ -193,15 +206,38 @@ class Round():
         frame.rowconfigure(list(range(4)), weight=1)
         frame.columnconfigure(list(range(7)), weight=1)
 
-        self.dice_image = PhotoImage(file="green_dice1.png")
-        self.shop_dice_image = self.dice_image.subsample(2)
-
         self.current_dice_label = Label(frame, font =self.large_font, text = "Current Dice", bg=self.bg_colour)
         self.current_dice_label.grid(padx=1, pady=15,sticky = NSEW, row=0, columnspan=7)
 
         for x in range(6):
                 self.dice_button = Button(frame, image=self.shop_dice_image, text= f"Dice {x + 1}", bg="black", font=self.font, compound=CENTER, borderwidth=0)
-                self.dice_button.grid(column=x, row=1, padx=10) 
+                self.dice_button.grid(column=x, row=1, padx=10)
+        return frame
+
+    def shop_content(self, master):
+        frame = Frame(master)
+        frame.configure(bg=self.bg_colour)
+
+        frame.grid(row=0, column=1, sticky="nsew")
+        frame.rowconfigure(list(range(4)), weight=1)
+        frame.columnconfigure(list(range(7)), weight=1)
+        
+        self.shop_label = Label(frame, font =self.large_font, text = "Shop", bg=self.bg_colour)
+        self.shop_label.grid(padx=1, pady=15,sticky = NSEW, row=2, columnspan=7)
+
+        with open("shop_dice.json", "r") as file:
+            self.shop_dice = json.load(file)
+            self.items_in_shop = []
+        for i in range(2):
+            self.items_in_shop.append(self.shop_dice[str(random.randint(0, len(self.shop_dice) - 1))])
+            print(self.items_in_shop)
+
+        self.shop_dice_buttons = []
+        for i in self.items_in_shop:
+            self.dice_button = Button(frame, text=i["name"], bg="black", font=self.font, compound=CENTER, borderwidth=0,image=self.dice_image)
+            self.dice_button.config(text=f"{i['name']} - Cost: {i['cost']}", compound=CENTER, image=self.dice_image)
+            self.dice_button.grid(row=3, column=self.items_in_shop.index(i), padx=10)
+            self.shop_dice_buttons.append(self.dice_button)
 
         return frame       
 
@@ -319,6 +355,9 @@ class Round():
         self.round_requirement = round_data["Round" + str(self.round)]["Requirement"]
         if self.total >= self.round_requirement:
             self.win = True
+            self.money += round_data["Round" + str(self.round)]["Payout"]
+            self.update_shop()
+            self.update_sidebar()
             self.show_frames("ShopMenu")
         else:
             self.win = False
@@ -335,11 +374,28 @@ class Round():
         self.total = 0
         self.max_hands = 5
         self.roll_dice()
+        self.money = 0
 
     def update_sidebar(self):
         self.requirement_label.config(text=f"Requirement: {self.round_requirement}")
         self.total_label.config(text=f"Total: {self.total}")
         self.scoring_label.config(text=f"Remaining Hands: {self.max_hands}")
+        print("UPDATE")
+        print(self.money)
+        self.money_label.config(text=f"Money: {self.money}")
+        
+
+    def update_shop(self):
+        with open("shop_dice.json", "r") as file:
+            self.shop_dice = json.load(file)
+            self.items_in_shop = []
+        for i in range(2):
+            self.items_in_shop.append(self.shop_dice[str(random.randint(0, len(self.shop_dice) - 1))])
+            print(self.items_in_shop)
+
+        for  i in range(len(self.shop_dice_buttons)):
+            self.shop_dice_update = self.shop_dice_buttons[i]
+            self.shop_dice_update.config(text=f"{self.items_in_shop[i]['name']} - Cost: {self.items_in_shop[i]['cost']}", compound=CENTER, image=self.dice_image)
 
 GAME_RUNNING = Round()
 GAME_RUNNING.run()
