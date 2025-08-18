@@ -80,9 +80,7 @@ class Round():
         for i in range(len(self.dice_locked)):
             if self.dice_locked[f"die{i+1}"]:
                 continue  # Skip locked dice
-            num_sides = len(self.dice[f"die{i+1}"])
-            die = random.randint(1, num_sides)
-            value = self.dice[f"die{i+1}"][f"side{die}"]["value"]
+            value = random.choice(self.dice[f"die{i+1}"]["sides"])
             self.dice_score[f"die{i+1}"] = value
         self.played = list(self.dice_score.values())
         print(self.played)
