@@ -37,15 +37,11 @@ class Round():
         self.container.grid(row=0, column=0, sticky="nsew")
         self.container.rowconfigure(0, weight=1)
         # Create 2 columns: one for the sidebar, one for the content
-        self.container.columnconfigure(0, weight=0) # Sidebar column (fixed size)
-        self.container.columnconfigure(1, weight=1) # Content column (expands)
+        self.container.columnconfigure(0, weight=0)
+        self.container.columnconfigure(1, weight=1)
 
         # Create the sidebar frame ONCE and place it in the first column
         self.sidebar_frame = self.sidebar(self.container)
-        self.sidebar_frame.grid(row=0, column=0, sticky="nsew")
-
-
-        self.sidebar_frame = self.sidebar(Frame(self.container))
         self.sidebar_frame.grid(row=0, column=0, sticky="nsew")
 
         self.frames = {}
@@ -53,6 +49,7 @@ class Round():
         self.frames["ShopMenu"] = self.shop()
         self.frames["GameMenu"] = self.game()
         self.frames["LossScreen"] = self.game_lose()
+        self.frames["ReplaceDice"] = self.replace_dice()
 
         self.font = "Arial 16"
         self.large_font = "Arial 30"
@@ -60,21 +57,8 @@ class Round():
         self.show_frames("MainMenu")
         self.max_rounds = 5
         self.round = 0
-        
-        #while self.round < self.max_rounds:
-        #    self.round += 1
-        #    self.dice_score = {}
-        #    self.played = []
-        #    self.total = 0
-        #    self.max_hands = 5
-        #    self.roll_dice()
-
-        
-        
     
     def show_frames(self, container):
-        #frame = self.frames[container]
-        #frame.tkraise()
 
         for frame_name, frame_instance in self.frames.items():
             # Hide all other frames
@@ -265,18 +249,58 @@ class Round():
             print(self.items_in_shop)
 
         self.shop_dice_buttons = []
-        for i in self.items_in_shop:
-            self.dice_button = Button(frame, text=i["name"], bg="black", font=self.font, compound=CENTER, borderwidth=0,image=self.dice_image)
-            self.dice_button.config(text=f"{i['name']} - Cost: {i['cost']}", compound=CENTER, image=self.dice_image)
-            self.dice_button.grid(row=3, column=self.items_in_shop.index(i), padx=10)
-            self.shop_dice_buttons.append(self.dice_button)
+        for i in range(len(self.items_in_shop)):
+            self.shop_dice_button = Button(frame, text=f"{self.items_in_shop[i]['name']} - Cost: {self.items_in_shop[i]['cost']}", bg="black", font=self.font, compound=CENTER, borderwidth=0,image=self.dice_image, command = lambda value=i: self.check_price(value))
+            self.shop_dice_button.grid(row=3, column=i, padx=10)
+            self.shop_dice_buttons.append(self.shop_dice_button)
 
         return frame       
 
+    def new_shop_dice(self):
+        with open("shop_dice.json", "r") as file:
+            self.shop_dice = json.load(file)
+            self.items_in_shop = []
+        for i in range(2):
+            self.items_in_shop.append(self.shop_dice[str(random.randint(0, len(self.shop_dice) - 1))])
+        print(self.items_in_shop)
 
+        self.dice_costs = []
+        for i in range(len(self.shop_dice_buttons)):
+            self.dice_costs.append(self.items_in_shop[i]['cost'])
+            self.button_to_update = self.shop_dice_buttons[i]
+            self.button_to_update.config(text=f"{self.items_in_shop[i]['name']} - Cost: {self.items_in_shop[i]['cost']}")
+        print(self.dice_costs)
+
+    def check_price(self, position):
+        if int(self.money_var.get().split(" ")[1]) >= self.dice_costs[position]:
+            self.show_frames("ReplaceDice")
+        else:
+            print("not enough money")
+        
+    def replace_dice(self):
+        frame = Frame(self.container)
+        frame.configure(bg=self.bg_colour)
+
+        frame.grid(row=0, column=1, sticky="nsew")
+        frame.rowconfigure(list(range(4)), weight=1)
+        frame.columnconfigure(list(range(2)), weight=1)
+        
+        self.current_dice_label = Label(frame, font =self.large_font, text = "Select a dice to replace", bg=self.bg_colour)
+        self.current_dice_label.grid(padx=1, pady=15,sticky = NSEW, row=0, columnspan=7)
+
+        for x in range(3):
+            for y in range(2):
+                die = "die" + str(x*2 + y + 1)
+                dice = self.dice[die]
+                faces = dice["sides"]
+                self.dice_button = Button(frame, image=self.dice_image, text= f"Dice {x*2 + y + 1} \nFaces: {faces}", bg="black", font=self.font, compound=CENTER, borderwidth=0, wraplength=150, justify=CENTER)
+                self.dice_button.grid(row=x+1, column=y, padx=100)
+
+        return frame
 
     def run(self):
         self.root.mainloop()
+
     def quit(self):
         self.root.destroy()
 
@@ -379,7 +403,7 @@ class Round():
             current_money = int(self.money_var.get().split(" ")[1])
             new_money = current_money + payout
             self.money_var.set(f"Money: {new_money}")
-            self.update_shop()
+            self.new_shop_dice()
             self.show_frames("ShopMenu")
         else:
             self.win = False
@@ -387,7 +411,9 @@ class Round():
         return self.win
 
     def game_reset(self):
-        self.dice_locked = {"die1": False, "die2": False, "die3": False, "die4": False, "die5": False, "die6": False}
+        self.dice_locked = {"die1": True, "die2": True, "die3": True, "die4": True, "die5": True, "die6": True}
+        for i in range(len(self.dice_locked)):
+            self.lock_dice(i + 1)
         self.total = 0
         self.round = 0
         self.round += 1
@@ -403,22 +429,8 @@ class Round():
         self.requirement_label.config(text=f"Requirement: {self.round_requirement}")
         self.total_label.config(text=f"Total: {self.total}")
         self.scoring_label.config(text=f"Remaining Hands: {self.max_hands}")
-        print("UPDATE")
-        print(self.money)
         self.money_label.config(text=f"Money: {self.money}")
         
-
-    def update_shop(self):
-        with open("shop_dice.json", "r") as file:
-            self.shop_dice = json.load(file)
-            self.items_in_shop = []
-        for i in range(2):
-            self.items_in_shop.append(self.shop_dice[str(random.randint(0, len(self.shop_dice) - 1))])
-            print(self.items_in_shop)
-
-        for  i in range(len(self.shop_dice_buttons)):
-            self.shop_dice_update = self.shop_dice_buttons[i]
-            self.shop_dice_update.config(text=f"{self.items_in_shop[i]['name']} - Cost: {self.items_in_shop[i]['cost']}", compound=CENTER, image=self.dice_image)
 
 GAME_RUNNING = Round()
 GAME_RUNNING.run()
