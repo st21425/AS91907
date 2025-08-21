@@ -84,7 +84,6 @@ class Round():
             self.sidebar_frame.grid(row=0, column=0, sticky="nsew")
             frame_to_show.grid(row=0, column=1, sticky="nsew")
             frame_to_show.tkraise()
-
     #create the main menu
     def menu(self):
         frame = Frame(self.container)
@@ -201,15 +200,15 @@ class Round():
         self.dice_buttons = []
 
         #make the dice in a 2x3 grid
-        for x in range(3):
-            for y in range(2):
-                print(x*2 + y + 1)
-                self.dice_button = Button(frame, image=self.dice_image, text=self.played[x*2 + y], bg="black", font=self.large_font, compound=CENTER, borderwidth=0, command=lambda value=(x*2 + y + 1): self.lock_dice(value))
-                self.dice_button.grid(row=x, column=y, padx=100)
+        for y in range(2):
+            for x in range(3):
+                print(x +1 + y*3)
+                self.dice_button = Button(frame, image=self.dice_image, text=self.played[x*2 + y], bg="black", font=self.large_font, compound=CENTER, borderwidth=0, command=lambda value=(x +1 + y*3): self.lock_dice(value))
+                self.dice_button.grid(row=y, column=x, padx=100)
                 self.dice_buttons.append(self.dice_button)
         
         play_button = Button(frame, text="Play Hand", bg=self.button_colour, font=self.large_font, compound=CENTER, borderwidth=0, command=self.play_hand)
-        play_button.grid(row=1, column=2)
+        play_button.grid(row=2, column=1)
         
         return frame
     #current dice for the shop menu
@@ -231,6 +230,8 @@ class Round():
         return frame
     #play the current hand
     def play_hand(self):
+        print(f"requirement {self.round_requirement}")
+        print(f"round {self.round}")
         self.roll_dice()
         self.calculate_score()
         self.max_hands -= 1 
@@ -263,9 +264,12 @@ class Round():
         #make the buttons for the dice in shop
         self.shop_dice_buttons = []
         for i in range(len(self.items_in_shop)):
-            self.shop_dice_button = Button(frame, text=f"{self.items_in_shop[i]['name']} - Cost: {self.items_in_shop[i]['cost']}", bg="black", font=self.font, compound=CENTER, borderwidth=0,image=self.dice_image, command = lambda value=i: self.check_price(value))
+            self.shop_dice_button = Button(frame, text=f"{self.items_in_shop[i]['name']} \nCost: {self.items_in_shop[i]['cost']}", bg="black", font=self.font, compound=CENTER, borderwidth=0,image=self.dice_image, command = lambda value=i: self.check_price(value))
             self.shop_dice_button.grid(row=3, column=i, padx=10)
             self.shop_dice_buttons.append(self.shop_dice_button)
+
+        self.next_round_button = Button(frame, text="Next Round", bg=self.button_colour, font=self.large_font, command=lambda: self.next_round())
+        self.next_round_button.grid(row=3, column=3, padx=10, pady=10)
 
         return frame       
     #get new dice for the shop
@@ -283,7 +287,7 @@ class Round():
         for i in range(len(self.shop_dice_buttons)):
             self.dice_costs.append(self.items_in_shop[i]['cost'])
             self.button_to_update = self.shop_dice_buttons[i]
-            self.button_to_update.config(text=f"{self.items_in_shop[i]['name']} - Cost: {self.items_in_shop[i]['cost']}")
+            self.button_to_update.config(text=f"{self.items_in_shop[i]['name']} \nCost: {self.items_in_shop[i]['cost']}")
         print(self.dice_costs)
     #checks if the user has enough money for new dice
     def check_price(self, position):
@@ -298,20 +302,20 @@ class Round():
         frame.configure(bg=self.bg_colour)
 
         frame.grid(row=0, column=1, sticky="nsew")
-        frame.rowconfigure(list(range(4)), weight=1)
+        frame.rowconfigure(list(range(3)), weight=1)
         frame.columnconfigure(list(range(2)), weight=1)
         
         self.current_dice_label = Label(frame, font =self.large_font, text = "Select a dice to replace", bg=self.bg_colour)
         self.current_dice_label.grid(padx=1, pady=15,sticky = NSEW, row=0, columnspan=7)
 
         #display current dice in a 2x3 grid
-        for x in range(3):
-            for y in range(2):
-                die = "die" + str(x*2 + y + 1)
+        for y in range(2):
+            for x in range(3):
+                die = "die" + str(x +1 + y*3)
                 dice = self.dice[die]
                 faces = dice["sides"]
-                self.dice_button = Button(frame, image=self.dice_image, text= f"Dice {x*2 + y + 1} \nFaces: {faces}", bg="black", font=self.font, compound=CENTER, borderwidth=0, wraplength=150, justify=CENTER, command = lambda value=(x*2 + y + 1): self.dice_change(value))
-                self.dice_button.grid(row=x+1, column=y, padx=100)
+                self.dice_button = Button(frame, image=self.dice_image, text= f"Dice {x +1 + y*3} \nFaces: {faces}", bg="black", font=self.font, compound=CENTER, borderwidth=0, wraplength=150, justify=CENTER, command = lambda value=(x +1 + y*3): self.dice_change(value))
+                self.dice_button.grid(row=y+1, column=x, padx=100)
 
         return frame
     #replace current dice with shop dice
@@ -439,19 +443,24 @@ class Round():
         return self.win
     #reset all the values for new game
     def game_reset(self):
+        with open("dice.json", "r") as file: 
+            self.dice = json.load(file)
         self.dice_locked = {"die1": True, "die2": True, "die3": True, "die4": True, "die5": True, "die6": True}
         for i in range(len(self.dice_locked)):
             self.lock_dice(i + 1)
         self.total = 0
         self.round = 0
         self.round += 1
+        with open("round.json", "r") as file: 
+            round_data = json.load(file)
+        self.round_requirement = round_data["Round" + str(self.round)]["Requirement"]
         self.dice_score = {}
         self.played = []
-        self.total = 0
         self.max_hands = 5
         self.roll_dice()
         self.money = 0
         self.money_var.set(f"Money: {self.money}")
+        self.update_sidebar()
     #updates the sidebar with new values
     def update_sidebar(self):
         self.requirement_label.config(text=f"Requirement: {self.round_requirement}")
@@ -459,6 +468,21 @@ class Round():
         self.scoring_label.config(text=f"Remaining Hands: {self.max_hands}")
         self.money_label.config(text=f"Money: {self.money}")
         
+    def next_round(self):
+        self.round += 1
+        with open("round.json", "r") as file: 
+            round_data = json.load(file)
+        self.round_requirement = round_data["Round" + str(self.round)]["Requirement"]
+        self.dice_locked = {"die1": True, "die2": True, "die3": True, "die4": True, "die5": True, "die6": True}
+        for i in range(len(self.dice_locked)):
+            self.lock_dice(i + 1)
+        self.total = 0
+        self.dice_score = {}
+        self.played = []
+        self.max_hands = 5
+        self.roll_dice()
+        self.show_frames("GameMenu")
+        self.update_sidebar()
 #run the game
 game = Round()
 game.run()
