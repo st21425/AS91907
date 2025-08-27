@@ -1,0 +1,32 @@
+{
+    "die1":
+    {
+        "type": "standard",
+        "sides": [1,2,3,4,5,6]
+    },
+    "die2":
+    {
+        "type": "standard",
+        "sides": [1,2,3,4,5,6]
+    },
+    "die3":
+    {
+        "type": "standard",
+        "sides": [1,2,3,4,5,6]
+    },
+    "die4":
+    {
+        "type": "standard",
+        "sides": [1,2,3,4,5,6]
+    },
+    "die5":
+    {
+        "type": "standard",
+        "sides": [1,2,3,4,5,6]
+    },
+    "die6":
+    {
+        "type": "standard",
+        "sides": [1,2,3,4,5,6]
+    }
+}
