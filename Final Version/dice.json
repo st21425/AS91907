@@ -1,0 +1,74 @@
+{
+    "die1": {
+        "name": "Standard Dice",
+        "type": "standard",
+        "sides": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+        ]
+    },
+    "die2": {
+        "name": "Standard Dice",
+        "type": "standard",
+        "sides": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+        ]
+    },
+    "die3": {
+        "name": "Standard Dice",
+        "type": "standard",
+        "sides": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+        ]
+    },
+    "die4": {
+        "name": "Standard Dice",
+        "type": "standard",
+        "sides": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+        ]
+    },
+    "die5": {
+        "name": "Standard Dice",
+        "type": "standard",
+        "sides": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+        ]
+    },
+    "die6": {
+        "name": "Standard Dice",
+        "type": "standard",
+        "sides": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+        ]
+    }
+}

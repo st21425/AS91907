@@ -1,0 +1,16 @@
+{
+    "standard":
+    {
+        "colour": "#0BADA2", 
+        "score": 0,
+        "+mult": 0,
+        "xmult": 1
+    },
+    "magic":
+    {
+        "colour": "#3F8D8D",
+        "score": 0,
+        "+mult": 0,
+        "xmult": 2
+    }
+}

@@ -1,0 +1,30 @@
+{
+    "0":
+    {
+        "name": "Standard Dice",
+        "type": "standard",
+        "sides": [1,2,3,4,5,6],
+        "cost": 2
+    },
+    "1":
+    {
+        "name": "Oops All Sixes",
+        "type": "standard",
+        "sides": [6,6,6,6,6,6],
+        "cost": 5
+    },
+    "2":
+    {
+        "name": "It's a 4 probably",
+        "type": "magic",
+        "sides": [100,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4],
+        "cost": 2
+    },
+    "3":
+    {
+        "name": "Magic Zero",
+        "type": "magic",
+        "sides": [0,0],
+        "cost": 2
+    }
+}
