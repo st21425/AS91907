@@ -14,11 +14,18 @@ class GUI():
         self.root.rowconfigure(0, weight=1)
         self.root.columnconfigure(0, weight=1)
 
+        self.faces_to_make = IntVar()
+        self.faces_to_make.set(1)
+
         self.played = [0,0,0,0,0,0]
 
+        with open("dice_types.json", "r") as file: 
+                self.dice_type_info = json.load(file)
+
         #load images
-        self.dice_image = PhotoImage(file="green_dice1.png")
-        self.locked_dice_image = PhotoImage(file="green_dice_locked1.png")
+        self.dice_image = PhotoImage(file="clear.png")
+        #self.locked_dice_image = PhotoImage(file="green_dice_locked1.png")
+        self.locked_dice_image = PhotoImage(file="lock_dice.png")
         self.shop_dice_image = self.dice_image.subsample(2)
 
         #open window in fullscreen
@@ -54,9 +61,10 @@ class GUI():
         self.frames["LossScreen"] = self.game_lose()
         self.frames["ReplaceDice"] = self.replace_dice()
         self.frames["AddDice"] = self.add_dice()
+        self.frames["AddFaces"] = self.add_faces()
 
-        #self.show_frames("MainMenu")
-        self.show_frames("AddDice")
+        self.show_frames("MainMenu")
+        #self.show_frames("AddDice")
     #set up the show frame function
     def show_frames(self, container):
 
@@ -67,7 +75,7 @@ class GUI():
         #make the correct frame
         frame_to_show = self.frames[container]
 
-        if container in ["MainMenu", "LossScreen", "AddDice"]:
+        if container in ["MainMenu", "LossScreen", "AddDice", "AddFaces"]:
             #for the menus we hide the sidebar and show only the menu
             self.sidebar_frame.grid_remove()
             frame_to_show.grid(row=0, column=0, sticky="nsew", columnspan=2)
@@ -191,11 +199,14 @@ class GUI():
         frame.columnconfigure(list(range(3)), weight=1)
 
         self.dice_buttons = []
+        self.update_sidebar()
 
         #make the dice in a 2x3 grid
         for y in range(2):
             for x in range(3):
-                self.dice_button = Button(frame, image=self.dice_image, text=self.played[x + y*3], bg="black", font=self.large_font, compound=CENTER, borderwidth=0, command=lambda value=(x +1 + y*3): self.toggle_dice(value))
+                dice_type = self.dice["die" + str(x + 1 + y*3)]["type"]
+                bg_colour = self.dice_type_info[dice_type]["colour"]
+                self.dice_button = Button(frame, image=self.dice_image, text=self.played[x + y*3], bg=bg_colour, font=self.large_font, compound=CENTER, borderwidth=0, command=lambda value=(x +1 + y*3): self.toggle_dice(value))
                 self.dice_button.grid(row=y, column=x, padx=100)
                 self.dice_buttons.append(self.dice_button)
         
@@ -219,7 +230,9 @@ class GUI():
         self.shop_dice_buttons = []
         i = 0
         for item in self.items_in_shop:
-            self.shop_dice_button = Button(frame, text=f"{item['name']} \nCost: {item['cost']}", bg="black", font=self.font, compound=CENTER, borderwidth=0, image=self.dice_image, command=lambda value=i: self.buy_dice(value)
+            dice_type = item["type"]
+            bg_colour = self.dice_type_info[dice_type]["colour"]
+            self.shop_dice_button = Button(frame, text=f"{item['name']} \nCost: {item['cost']}", bg=bg_colour, font=self.font, compound=CENTER, borderwidth=0, image=self.dice_image, command=lambda value=i: self.buy_dice(value)
             )
             self.shop_dice_button.grid(row=3, column=i, padx=10)
             self.shop_dice_buttons.append(self.shop_dice_button)
@@ -243,7 +256,9 @@ class GUI():
 
         #make the current dice in a line
         for x in range(6):
-                self.dice_button = Button(frame, image=self.shop_dice_image, text= f"Dice {x + 1}", bg="black", font=self.font, compound=CENTER, borderwidth=0)
+                dice_type = self.dice["die" + str(x + 1)]["type"]
+                bg_colour = self.dice_type_info[dice_type]["colour"]
+                self.dice_button = Button(frame, image=self.shop_dice_image, text= f"Dice {x + 1}", bg=bg_colour, font=self.font, compound=CENTER, borderwidth=0)
                 self.dice_button.grid(column=x, row=1, padx=10)
         return frame
     #pick a dice to replace for new dice
@@ -264,7 +279,9 @@ class GUI():
                 die = "die" + str(x +1 + y*3)
                 dice = self.dice[die]
                 faces = dice["sides"]
-                self.dice_button = Button(frame, image=self.dice_image, text= f"Dice {x +1 + y*3} \nFaces: {faces}", bg="black", font=self.font, compound=CENTER, borderwidth=0, wraplength=150, justify=CENTER, command = lambda value=(x +1 + y*3): self.dice_change(value))
+                dice_type = self.dice["die" + str(x + 1 + y*3)]["type"]
+                bg_colour = self.dice_type_info[dice_type]["colour"]
+                self.dice_button = Button(frame, image=self.dice_image, text= f"Dice {x +1 + y*3} \nFaces: {faces}", bg=bg_colour, font=self.font, compound=CENTER, borderwidth=0, wraplength=150, justify=CENTER, command = lambda value=(x +1 + y*3): self.dice_change(value))
                 self.dice_button.grid(row=y+1, column=x, padx=100)
 
         return frame
@@ -282,6 +299,7 @@ class GUI():
         self.scoring_label.config(text=f"Remaining Hands: {data['hands']}")
         self.money_label.config(text=f"Money: {data['money']}")
         self.played = data["played"]
+        self.dice = data["dice"]
     def toggle_dice(self, die_number):
         self.locked = self.logic.lock_dice(die_number)
 
@@ -310,12 +328,6 @@ class GUI():
                 self.refresh_shop_dice()
             else:
                 self.show_frames("LossScreen")
-    def sync_dice_buttons(self):
-        print(self.played)
-        #update the dice
-        #for i in range(len(self.dice_buttons)):
-            #self.button_update = self.dice_buttons[i]
-            #self.button_update.config(text=self.played[i])
     def gui_next_round(self):
         next_round = self.logic.next_round()
         if next_round == True:
@@ -323,7 +335,8 @@ class GUI():
                 self.button_update = self.dice_buttons[i]
                 self.button_update.config(image=self.dice_image)
                 self.show_frames("GameMenu")
-            else: self.show_frames("AddDice")
+        else: 
+            self.show_frames("AddDice")
     def gui_reset(self):
         self.logic.game_reset()
         for i in range(6):
@@ -353,17 +366,127 @@ class GUI():
         self.add_dice_label = Label(frame, text = "You can now add a dice", font = self.large_font, bg =self.bg_colour)
         self.add_dice_label.grid(padx=10, pady=15, sticky = NSEW, row = 0)
 
-        with open("dice_types.json", "r") as file: 
-                dice_type_info = json.load(file)
+        self.name_label = Label(frame, text = "Dice name", font = self.font, bg =self.bg_colour)
+        self.name_label.grid(padx=10, pady=15, sticky = NSEW, row = 1)
+
+        self.name_entry = Entry(frame, font = self.font)
+        self.name_entry.grid(padx=400, pady=15, sticky = NSEW, row = 2)
+
+        self.type_label = Label(frame, text = "Dice type", font = self.font, bg =self.bg_colour)
+        self.type_label.grid(padx=10, pady=15, sticky = NSEW, row = 3)
+
         dice_types = []
-        for dice_type in dice_type_info.keys():
+        for dice_type in self.dice_type_info.keys():
             dice_types.append(dice_type)
 
-        self.type_of_dice = ttk.Combobox(frame, font=self.font, values=dice_types, state="readonly")
-        self.type_of_dice.grid(padx=400, pady=15, sticky=NSEW, row=1)
+        self.combo_default = StringVar()
+        self.combo_default.set(dice_types[0])
+
+        self.type_of_dice = ttk.Combobox(frame, font=self.font, values=dice_types, state="readonly", textvariable = self.combo_default)
+        self.type_of_dice.grid(padx=400, pady=15, sticky=NSEW, row=4)
+
+        self.faces_label = Label(frame, text = "Number of die faces (2-20)", font = self.font, bg =self.bg_colour)
+        self.faces_label.grid(padx=10, pady=15, sticky = NSEW, row = 5)
+
+        self.faces_entry = Entry(frame, font = self.font)
+        self.faces_entry.grid(padx=400, pady=15, sticky = NSEW, row = 6)
+
+        self.cost_label = Label(frame, text = "Cost of dice (1-5)", font = self.font, bg =self.bg_colour)
+        self.cost_label.grid(padx=10, pady=15, sticky = NSEW, row = 7)
+
+        self.cost_entry = Entry(frame, font = self.font)
+        self.cost_entry.grid(padx=400, pady=15, sticky = NSEW, row = 8)
+
+        self.continue_dice = Button(frame, text="Choose face numbers", bg=self.button_colour, font=self.font, command=lambda: self.check_new_dice())
+        self.continue_dice.grid(padx=400, pady=10, sticky=NSEW, row = 9)
+
+        
 
         return frame
+    
+    def check_new_dice(self):
+        try:
+            self.faces = int(self.faces_entry.get())
+            self.dice_name = str(self.name_entry.get())
+            self.dice_type = self.type_of_dice.get()
+            self.dice_cost = int(self.cost_entry.get())
+            print(self.dice_type)
+            if self.faces < 2 or self.faces > 20:
+                self.faces_label.config(text = "Choose a valid number of faces between 2 and 20")
+                raise ValueError
+            if self.dice_name.strip() == "":
+                self.name_label.config(text = "Enter a dice name")
+                raise ValueError
+            if self.dice_cost < 1 or self.dice_cost > 5:
+                self.cost_label.config(text = "Choose a valid cost between 1 and 5")
+                raise ValueError
+            
+            self.faces_to_make.set(self.faces)
+            self.make_faces()
+            self.show_frames("AddFaces")
+            
+        except ValueError:
+            self.continue_dice.config(text = "Ensure all boxes have been filled before you continue")
 
+    def add_faces(self):
+        self.faces = 1
+        frame = Frame(self.container)
+        frame.configure(bg=self.bg_colour)
+
+        frame.grid(row=0, column=0, sticky="nsew")
+        frame.columnconfigure(0, weight=1)
+        frame.rowconfigure(list(range(22)), weight=1)
+
+        self.add_dice_label = Label(frame, text = "Choose the faces for the dice", font = self.large_font, bg =self.bg_colour)
+        self.add_dice_label.grid(padx=10, pady=15, sticky = NSEW, row = 0)
+
+        self.values_label = Label(frame, text = "Enter the values for each face of the dice (0-100)", font = self.font, bg =self.bg_colour)
+        self.values_label.grid(padx=10, pady=15, sticky = NSEW, row = 1)
+
+        self.entries = Frame(frame)
+        self.entries.grid()
+
+        self.entry_widgets = []
+        
+        self.make_faces()
+
+        self.submit_button = Button(frame, text="Submit Dice", bg=self.button_colour, font=self.font, command=lambda: self.submit_dice())
+        self.submit_button.grid(padx=400, pady=10, sticky=NSEW, row = (self.faces + 3))
+
+        return frame
+    
+    def make_faces(self):
+        for widget in self.entries.winfo_children():
+            widget.destroy()
+        self.entry_widgets.clear()
+
+        num = self.faces_to_make.get()
+        for i in range(num):
+            entry = Entry(self.entries)
+            entry.grid(row=i, column=0, padx=10, pady=5, sticky=NSEW)
+            self.entry_widgets.append(entry)
+    
+    def submit_dice(self):
+        values = []
+        for i in self.entry_widgets:
+            try:
+                value = int(i.get())
+                if value < 0 or value > 100:
+                    self.values_label.config(text = "Enter values between 0 and 100")
+                    raise ValueError
+                values.append(value)
+            except ValueError:
+                self.values_label.config(text = "Ensure all boxes have been filled with numbers before you continue")
+                return
+        self.new_dice = {}
+        self.new_dice["name"] = self.dice_name
+        self.new_dice["type"] = self.dice_type
+        self.new_dice["sides"] = self.faces_to_make.get()
+        self.new_dice["cost"] = self.dice_cost
+        self.new_dice["values"] = values
+        self.logic.add_dice(self.new_dice)
+
+        self.show_frames("MainMenu")
 #run the game
 game = GUI()
 game.run()

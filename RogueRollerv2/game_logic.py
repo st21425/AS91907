@@ -15,6 +15,8 @@ class Logic():
         self.items_in_shop = []
         with open("dice.json", "r") as file: 
             self.dice = json.load(file)
+        with open("dice_types.json", "r") as file: 
+            self.types = json.load(file)
         self.dice_score = {}
     #play the current hand
     def play_hand(self):
@@ -131,6 +133,13 @@ class Logic():
         except TypeError:
             self.score += self.scoring
 
+        for i in self.dice:
+            dice_type = self.dice[i]["type"]
+            properties = self.types[dice_type] 
+            self.score += properties["score"]
+            self.multiplier += properties["+mult"]
+            self.multiplier = self.multiplier * properties["xmult"]
+
         #calculate the score
         self.hand_score = self.score * self.multiplier
         self.total += self.score * self.multiplier
@@ -187,5 +196,13 @@ class Logic():
             return False
     #get info for gui
     def get_gui_data(self):
-        self.gui_info = {"requirement": self.round_requirement, "total": self.total,"hands": self.max_hands,"money": self.money, "played": self.played, "shop_dice": self.items_in_shop}
+        self.gui_info = {"requirement": self.round_requirement, "total": self.total,"hands": self.max_hands,"money": self.money, "played": self.played, "shop_dice": self.items_in_shop, "dice": self.dice}
         return self.gui_info
+    def add_dice(self, new_dice):
+        self.new_dice = new_dice
+        with open("shop_dice.json", "r") as file: 
+            self.shop_dice = json.load(file)
+        self.shop_dice[str(len(self.shop_dice))] = self.new_dice
+        print(self.shop_dice)
+        with open("shop_dice.json", "w") as file: 
+            json.dump(self.shop_dice, file, indent=4)
