@@ -1,3 +1,10 @@
+#Version 2
+#Rogue roller is a roguelike yahtzee game
+#Version 1: There is dice rolling, locking, scoring, game rounds
+#and a dice shop to buy new dice
+#Verion 2: Changed the way dice images were loaded to have multiple colours
+#also added new gui option upon winning allowing user to add a new dice to the shop
+#Version 3: Added tooltips to show the dice information
 from tkinter import *
 from tkinter import ttk
 from idlelib.tooltip import Hovertip
@@ -603,9 +610,8 @@ class GUI():
         self.new_dice = {}
         self.new_dice["name"] = self.dice_name
         self.new_dice["type"] = self.dice_type
-        self.new_dice["sides"] = self.faces_to_make.get()
+        self.new_dice["sides"] = values
         self.new_dice["cost"] = self.dice_cost
-        self.new_dice["values"] = values
         self.logic.add_dice(self.new_dice)
 
         self.show_frames("MainMenu")
@@ -617,9 +623,13 @@ class GUI():
             type_info = self.dice_type_info[tooltip_text["type"]]
             for key in type_info:
                 if type_info[key] != 0 and key != "colour":
-                    if type_info["xmult"] != 1:
+                    if type_info[key] == type_info["xmult"]:
+                        if type_info["xmult"] != 1:
+                            tooltip_attributes = (tooltip_attributes +
+                                                  f" {key}: {type_info[key]}\n")
+                    else:
                         tooltip_attributes = (tooltip_attributes +
-                                              f" {key}: {type_info[key]}\n")
+                                                  f" {key}: {type_info[key]}\n")
             tooltip_name = f"Name: {tooltip_text['name']}\n"
             tooltip_type = f"Type: {tooltip_text['type'].title()}\n"
             tooltip_editions = f"Editions {tooltip_attributes}"
@@ -676,3 +686,4 @@ class GUI():
 # run the game
 game = GUI()
 game.run()
+
