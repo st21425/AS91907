@@ -60,15 +60,5 @@
             0
         ],
         "cost": 2
-    },
-    "4": {
-        "name": "All or nothing",
-        "type": "paper",
-        "sides": 2,
-        "cost": 1,
-        "values": [
-            0,
-            100
-        ]
     }
 }
