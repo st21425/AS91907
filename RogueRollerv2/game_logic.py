@@ -1,3 +1,8 @@
+#Version 2
+#Rogue roller is a roguelike yahtzee game
+#Version 1: There is dice rolling, locking, scoring, game rounds
+#and a dice shop to buy new dice
+#Verion 2: Added logic for adding new dice to the shop
 import json
 import random
 
@@ -206,3 +211,4 @@ class Logic():
         print(self.shop_dice)
         with open("shop_dice.json", "w") as file: 
             json.dump(self.shop_dice, file, indent=4)
+
