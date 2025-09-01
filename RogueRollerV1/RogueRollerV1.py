@@ -1,3 +1,7 @@
+#Version 1
+#Rogue roller is a roguelike yahtzee game
+#Version 1: There is dice rolling, locking, scoring, game rounds
+#and a dice shop to buy new dice
 from tkinter import *
 import json
 import random
@@ -485,4 +489,5 @@ class Round():
         self.update_sidebar()
 #run the game
 game = Round()
+
 game.run()
