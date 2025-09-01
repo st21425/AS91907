@@ -1,3 +1,9 @@
+#Version 2
+#Rogue roller is a roguelike yahtzee game
+#Version 1: There is dice rolling, locking, scoring, game rounds
+#and a dice shop to buy new dice
+#Verion 2: Changed the way dice images were loaded to have multiple colours
+#also added new gui option upon winning allowing user to add a new dice to the shop
 from tkinter import *
 from tkinter import ttk
 import json
@@ -489,4 +495,5 @@ class GUI():
         self.show_frames("MainMenu")
 #run the game
 game = GUI()
+
 game.run()
